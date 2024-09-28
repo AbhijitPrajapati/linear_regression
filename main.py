@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from linear_regression import train, predict
+from linear_regression import train
 
 def preprocess_data():
     data = pd.read_csv('customer_purchasing_behaviors.csv').drop('user_id', axis=1)
@@ -26,19 +26,13 @@ def preprocess_data():
 
 
 if __name__ == '__main__':
-    # data, scaler_params = preprocess_data()
-    # coefs, intercept = train(np.delete(data, 2, axis=1), data[:, 2])
+    learning_rate = 0.02
+    num_epochs = 300
 
-    # if int(input('Save? [0/1]: ')):
-    #     np.savez('model', coefs=coefs, intercept=intercept, scaler_params=scaler_params)
-    
-    # print(predict(np.array([25,45000,4.5,12, 1, 0, 0, 0]), 2, coefs, intercept, scaler_params))
-
-    model = np.load('model.npz', allow_pickle=True)
-    coefs, intercept, scaler_params = model['coefs'], model['intercept'], model['scaler_params']
-    model.close()
-
-    print(predict(np.array([25,45000,4.5,12, 1, 0, 0, 0]), 2, coefs, intercept, scaler_params))
+    data, scaler_params = preprocess_data()
+    coefs, intercept = train(np.delete(data, 2, axis=1), data[:, 2], learning_rate, num_epochs)
+    if int(input('Save? [0/1]: ')):
+        np.savez('model', coefs=coefs, intercept=intercept, scaler_params=scaler_params)
 
 
     

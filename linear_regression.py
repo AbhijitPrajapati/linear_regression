@@ -1,14 +1,11 @@
 import numpy as np
 
-learning_rate = 0.02
-num_epochs = 300
-
 MSE = lambda target, pred: np.sum((target - pred) ** 2) / len(target)
 DMSE = lambda target, pred: 2 / len(target) * (pred - target)
 
 FOREWARD = lambda coefs, intercept, data: np.sum(coefs * data, axis=1) + intercept
 
-def train(features, target):
+def train(features, target, learning_rate, num_epochs, verbose=1):
     if len(features.shape) == 1:
         raise ValueError('Feature arrays must be 2D')
 
@@ -26,20 +23,9 @@ def train(features, target):
         coefs = coefs - learning_rate * coef_grads
         intercept = intercept - learning_rate * intercept_grad
 
-        if epoch % 10 == 0:
+        if epoch % 10 == 0 and verbose:
             # compute loss
             loss = MSE(target, FOREWARD(coefs, intercept, features))
             print(f'Epoch: {epoch}\nLoss: {loss}')
     
     return coefs, intercept
-
-def predict(input, target_ind, coefs, intercept, scaler_params=None):
-    if not scaler_params:
-        # establishes scaling parameters that do not do anything
-        scaler_params = [(1, 0) for _ in range(len(input) + 1)]
-
-    scaled_input = [(i - m) / r for i, (r, m) in zip(input, np.delete(scaler_params, target_ind, axis=0))]
-    scaled_output = FOREWARD(coefs, intercept, np.array(scaled_input).reshape(1, -1))[0]
-    unscaled_output = scaled_output * scaler_params[target_ind][0] + scaler_params[target_ind][1]
-
-    return unscaled_output
